@@ -206,6 +206,20 @@ The system provides specialized error types:
 - `ValidationError` - Invalid data (400)
 - `ConflictError` - Constraint violations (409)
 
+Raw driver failures are translated by `handleDatabaseError()` in `api/src/utils/errors.ts`:
+
+| SQLite condition | Mapped error | Status |
+| --- | --- | --- |
+| `SQLITE_CONSTRAINT_UNIQUE` / `SQLITE_CONSTRAINT_PRIMARYKEY` | `ConflictError` | 409 |
+| `SQLITE_CONSTRAINT_FOREIGNKEY` | `ValidationError` | 400 |
+| Other `SQLITE_CONSTRAINT_*` (e.g. `NOT NULL`, `CHECK`) | `ValidationError` | 400 |
+| `SQLITE_BUSY*` / `SQLITE_LOCKED*` | `DatabaseError` (`DATABASE_BUSY`) | 503 |
+| `No rows affected` for a known entity/id | `NotFoundError` | 404 |
+| Anything else | `DatabaseError` (`DATABASE_ERROR`) | 500 |
+
+Every translated failure emits a structured JSON log line (`event: "database_error"`) containing the
+driver code, entity, id and timestamp so failures can be correlated and monitored.
+
 These errors are automatically handled by the Express error middleware and return appropriate HTTP status codes.
 
 ## Performance Considerations
