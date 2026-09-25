@@ -82,10 +82,10 @@ export function handleDatabaseError(error: unknown, entity?: string, id?: string
   // SQLite constraint violation (UNIQUE, FOREIGN KEY, etc.)
   // better-sqlite3 reports extended codes such as SQLITE_CONSTRAINT_UNIQUE
   if (code.startsWith('SQLITE_CONSTRAINT') || message.includes('constraint failed')) {
-    if (code === 'SQLITE_CONSTRAINT_UNIQUE' || code === 'SQLITE_CONSTRAINT_PRIMARYKEY' || message.includes('UNIQUE')) {
+    if (code === 'SQLITE_CONSTRAINT_UNIQUE' || code === 'SQLITE_CONSTRAINT_PRIMARYKEY' || message.includes('UNIQUE constraint failed')) {
       throw new ConflictError('Resource already exists');
     }
-    if (code === 'SQLITE_CONSTRAINT_FOREIGNKEY' || message.includes('FOREIGN KEY')) {
+    if (code === 'SQLITE_CONSTRAINT_FOREIGNKEY' || message.includes('FOREIGN KEY constraint failed')) {
       throw new ValidationError('Invalid reference to related entity');
     }
     throw new ValidationError(message);
