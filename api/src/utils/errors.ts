@@ -81,7 +81,7 @@ export function handleDatabaseError(error: unknown, entity?: string, id?: string
 
   // SQLite constraint violation (UNIQUE, FOREIGN KEY, etc.)
   // better-sqlite3 reports extended codes such as SQLITE_CONSTRAINT_UNIQUE
-  if (code.startsWith('SQLITE_CONSTRAINT') || message.includes('SQLITE_CONSTRAINT')) {
+  if (code.startsWith('SQLITE_CONSTRAINT') || message.includes('constraint failed')) {
     if (code === 'SQLITE_CONSTRAINT_UNIQUE' || code === 'SQLITE_CONSTRAINT_PRIMARYKEY' || message.includes('UNIQUE')) {
       throw new ConflictError('Resource already exists');
     }
